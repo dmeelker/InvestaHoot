@@ -13,6 +13,15 @@ builder.Services.AddHttpClient<VestaboardService>();
 builder.Services.AddSingleton<GameManager>();
 builder.Services.AddHostedService<GameDriverService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("*");
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +36,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors();
 
 app.UseAuthorization();
 

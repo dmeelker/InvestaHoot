@@ -17,7 +17,7 @@ namespace Investahoot.Web.Controller
         }
 
         [HttpPost]
-        [Route("/join")]
+        [Route("join")]
         public async Task<IActionResult> JoinGame(string name)
         {
             var player = new Player(name);
@@ -32,7 +32,7 @@ namespace Investahoot.Web.Controller
         }
 
         [HttpGet]
-        [Route("/state")]
+        [Route("state")]
         public IActionResult GetState(Guid gameId, Guid playerId)
         {
             if (_gameManager.GameId != gameId)
@@ -76,7 +76,7 @@ namespace Investahoot.Web.Controller
         }
 
         [HttpPost]
-        [Route("/answer")]
+        [Route("answer")]
         public async Task<IActionResult> JoinGame(Guid gameId, Guid playerId, int answer)
         {
             if (_gameManager.GameId != gameId)
