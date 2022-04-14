@@ -41,6 +41,8 @@ namespace Investahoot.Web.Controller
             if (!_gameManager.PlayerExists(playerId))
                 return BadRequest("Invalid player id");
 
+            var player = _gameManager.GetPlayer(playerId);
+
             switch (_gameManager.State)
             {
                 case GameManager.GameState.Lobby:
@@ -57,7 +59,8 @@ namespace Investahoot.Web.Controller
                             State = "Question",
                             RoundId = _gameManager.CurrentRound!.Id,
                             Answers = _gameManager.CurrentRound!.Question.Answers,
-                            TimeLeft = _gameManager.CurrentRound!.TimeLeft.TotalSeconds
+                            TimeLeft = _gameManager.CurrentRound!.TimeLeft.TotalSeconds,
+                            Answered = player.AnsweredQuestion(_gameManager.CurrentRound!.Question.Id)
                         });
                 case GameManager.GameState.Score:
                     return Ok(

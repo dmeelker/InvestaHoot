@@ -114,7 +114,7 @@ namespace Investahoot.Model
 
         private bool AllPlayersAnswered => Players.All(p => p.AnsweredQuestion(CurrentRound!.Question.Id));
 
-        private Player GetPlayer(Guid id) => Players.Single(p => p.Id == id);
+        public Player GetPlayer(Guid id) => Players.Single(p => p.Id == id);
 
         public bool PlayerExists(Guid id) => Players.Any(p => p.Id == id);
 
