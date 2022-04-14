@@ -116,6 +116,7 @@ namespace Investahoot.Model
 
         private Player GetPlayer(Guid id) => Players.Single(p => p.Id == id);
 
+        public bool PlayerExists(Guid id) => Players.Any(p => p.Id == id);
 
         private void ThrowIfNotInState(GameState state)
         {

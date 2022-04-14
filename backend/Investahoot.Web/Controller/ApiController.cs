@@ -33,8 +33,14 @@ namespace Investahoot.Web.Controller
 
         [HttpGet]
         [Route("/state")]
-        public IActionResult GetState(Guid id, Guid playerId)
+        public IActionResult GetState(Guid gameId, Guid playerId)
         {
+            if (_gameManager.GameId != gameId)
+                return BadRequest("Invalid game id");
+
+            if (!_gameManager.PlayerExists(playerId))
+                return BadRequest("Invalid player id");
+
             switch (_gameManager.State)
             {
                 case GameManager.GameState.Lobby:
@@ -73,6 +79,12 @@ namespace Investahoot.Web.Controller
         [Route("/answer")]
         public async Task<IActionResult> JoinGame(Guid gameId, Guid playerId, int answer)
         {
+            if (_gameManager.GameId != gameId)
+                return BadRequest("Invalid game id");
+
+            if (!_gameManager.PlayerExists(playerId))
+                return BadRequest("Invalid player id");
+
             await _gameManager.GiveAnswer(playerId, answer);
             return Ok();
         }
