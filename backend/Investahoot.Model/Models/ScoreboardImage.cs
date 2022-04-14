@@ -13,7 +13,7 @@
             {
                 var name = player.Name.ToUpper();
                 var score = player.Score;
-                var line = $"{score} {name}";
+                var line = $"{score} - {name}";
                 
                 image.SetText(2, index + 2, line);
             }
