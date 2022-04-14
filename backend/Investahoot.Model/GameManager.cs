@@ -30,7 +30,7 @@ namespace Investahoot.Model
             RemainingQuestions = new Queue<Question>(AllQuestions);
             ChangeState(GameState.Lobby);
 
-            AddPlayer(new Player("Testman"));
+            PostLobbyToVestaboard();
         }
 
         public async Task AddPlayer(Player player)
@@ -46,11 +46,18 @@ namespace Investahoot.Model
             var image = new Image();
             image.SetCentered(0, "ooooooo PLAYERS oooooo");
 
-            var y = 1;
-            foreach (var player in Players)
+            if (!Players.Any())
             {
-                image.SetCentered(y, player.Name.ToUpper());
-                y++;
+                image.SetCentered(3, "404");
+            }
+            else
+            {
+                var y = 1;
+                foreach (var player in Players)
+                {
+                    image.SetCentered(y, player.Name.ToUpper());
+                    y++;
+                }
             }
 
             await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(image));
