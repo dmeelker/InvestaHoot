@@ -54,7 +54,7 @@ namespace Investahoot.Model
 
             CurrentRound = new Round(question);
 
-            //await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(CurrentRound.Question.Image));
+            await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(CurrentRound.Question.Image));
         }
 
         public async Task CheckIfTimeHasElapsed()
