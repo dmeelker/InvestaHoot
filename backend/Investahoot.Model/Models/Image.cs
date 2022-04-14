@@ -40,6 +40,17 @@ namespace Investahoot.Model.Models
             _cells[y, x] = value;
         }
 
+        public void SetText(int x, int y, string text)
+        {
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (x + i >= Width)
+                    break;
+
+                _cells[y, x + i] = text[i];
+            }
+        }
+
         public List<List<int>> ToVestaboardImage()
         {
             var result = new List<List<int>>();
