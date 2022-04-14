@@ -55,6 +55,7 @@ namespace Investahoot.Web.Controller
                         new
                         {
                             State = "Question",
+                            RoundId = _gameManager.CurrentRound!.Id,
                             Answers = _gameManager.CurrentRound!.Question.Answers,
                             TimeLeft = _gameManager.CurrentRound!.TimeLeft.TotalSeconds
                         });

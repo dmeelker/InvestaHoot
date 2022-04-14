@@ -4,6 +4,7 @@ namespace Investahoot.Model
 {
     public class Round
     {
+        public int Id { get; }
         public Question Question { get; }
         public DateTime StartTime { get; }
         public TimeSpan Duration => TimeSpan.FromHours(1);
@@ -11,8 +12,9 @@ namespace Investahoot.Model
         public TimeSpan TimeLeft => Duration - (DateTime.UtcNow - StartTime);
         public bool DurationElapsed => TimeLeft.TotalMilliseconds <= 0;
 
-        public Round(Question question)
+        public Round(int id, Question question)
         {
+            Id = id;
             Question = question;
             StartTime = DateTime.UtcNow;
         }

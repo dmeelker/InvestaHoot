@@ -53,7 +53,7 @@ namespace Investahoot.Model
         {
             var question = RemainingQuestions.Dequeue();
 
-            CurrentRound = new Round(question);
+            CurrentRound = new Round((CurrentRound?.Id ?? -1) + 1, question);
 
             await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(CurrentRound.Question.Image));
         }
