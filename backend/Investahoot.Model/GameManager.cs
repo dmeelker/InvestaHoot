@@ -12,6 +12,7 @@ namespace Investahoot.Model
             Score
         }
 
+        public Guid GameId { get; } = Guid.NewGuid();
         public List<Player> Players { get; } = new();
         public IEnumerable<Player> PlayersByScore => Players.OrderByDescending(player => player.Score);
         public List<Question> AllQuestions { get; } = new();
