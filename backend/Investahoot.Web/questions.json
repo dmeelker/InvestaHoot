@@ -1,33 +1,53 @@
 [
   {
     "Question": [
-      "oooooooooooooooooooooo",
-      "o                    o",
-      "oWAT IS HET ANTWOORD?o",
-      "o                    o",
-      "o    NANANANANANA    o",
-      "oooooooooooooooooooooo"
+      "         ppp       yyy",
+      "        p   p       yy",
+      "       p     p       y",
+      "       p  vv p        ",
+      "       p  vv p        ",
+      "gggggggpppppppgggggggg"
     ],
     "Answers": [
-      "Wat is de vraag?",
-      "Ja",
-      "Nee",
-      "42"
+      "Vrachtwagen",
+      "Huis",
+      "Vogel",
+      "Trein"
     ],
-    "CorrectAnswer": 3
+    "CorrectAnswer": 1
   },
   {
     "Question": [
-      "oooooooooooooooooooooo",
-      "o                    o",
-      "o  WAT IS VRAAG 2?   o",
-      "o                    o",
-      "o                    o",
-      "oooooooooooooooooooooo"
+      "                      ",
+      "   ooo  o  o ooo ooo  ",
+      "    o   oo o o    o   ",
+      "    o   o oo oo   o   ",
+      "   ooo  o  o o   ooo  ",
+      "                      "
     ],
     "Answers": [
-      "ja doei"
+      "Apple",
+      "Microsoft",
+      "INFI",
+      "Huh?"
     ],
-    "CorrectAnswer": 0
+    "CorrectAnswer": 2
+  },
+  {
+    "Question": [
+      "                      ",
+      "   WAT IS DE ZOON     ",
+      "     VAN JOUW TANTE   ",
+      "       VAN JOU?       ",
+      "                      ",
+      "bbbbbbbbbbbbbbbbbbbbbb"
+    ],
+    "Answers": [
+      "Je broer",
+      "Je vader",
+      "Je neef",
+      "Jezelf"
+    ],
+    "CorrectAnswer": 2
   }
 ]
