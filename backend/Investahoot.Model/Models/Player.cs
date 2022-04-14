@@ -11,6 +11,7 @@ namespace Investahoot.Model.Models
         public Guid Id { get; }
         public string Name { get; }
         public Dictionary<Guid, int> GivenAnswersPerQuestionId { get; } = new();
+        public int Score { get; private set; }
 
         public Player(string name)
         {
@@ -22,6 +23,11 @@ namespace Investahoot.Model.Models
         public void AddAnswer(Guid questionid, int answerIndex)
         {
             GivenAnswersPerQuestionId[questionid] = answerIndex;
+        }
+
+        public void GivePoints(int points)
+        {
+            Score += points;
         }
     }
 }

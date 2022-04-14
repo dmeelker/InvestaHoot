@@ -8,40 +8,45 @@
 <h3>Players:</h3>
 
 <ul>
-    @foreach (var player in @Model.Game.Players)
+    @foreach (var player in @Model.Game.PlayersByScore)
     {
-                                                            <li>@player.Name</li>
+        <li>@player.Name (score: @player.Score id: @player.Id)</li>
     }
 </ul>
 
 @if (Model.Game.State == Investahoot.Model.GameManager.GameState.Lobby)
 {
-                                                        <form asp-page-handler="BeginGame" method="post">
-                                                            <button>Begin game</button>
-                                                        </form>
-
+    <form asp-page-handler="BeginGame" method="post">
+        <button>Begin game</button>
+    </form>
 }
 else if (Model.Game.State == Investahoot.Model.GameManager.GameState.Question)
 {
-                                                        <div>Current question: </div>
+    <div>Current question: </div>
 
-                                                        <div>Time left: @Model.Game.CurrentRound!.TimeLeft.ToString()</div>
+    <div>Time left: @Model.Game.CurrentRound!.TimeLeft.ToString()</div>
 
-                                                        <h3>Answer options:</h3>
-                                                        <ul>
+    <h3>Answer options:</h3>
+    <ul>
         @foreach (var answer in @Model.Game.CurrentRound!.Question.Answers)
         {
-                                                                                                                <li>@answer</li>
+                            <li>@answer</li>
         }
-                                </ul>
+    </ul>
+
+    <form asp-page-handler="GiveAnswer" method="post">
+        PlayerID: <input name="playerId"><br/>
+        Answer: <input name="answerIndex">
+        <button>Post answer</button>
+    </form>
 }
 else if (Model.Game.State == Investahoot.Model.GameManager.GameState.Score)
 {
-                                <div>Game over! Scores here!</div>
+    <div>Game over!</div>
 }
 
-<script type="text/javascript">
+@*<script type="text/javascript">
     setTimeout(function () {
-      location.reload();
+    location.reload();
     }, 1000);
-  </script>
+    </script>*@

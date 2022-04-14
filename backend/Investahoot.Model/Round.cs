@@ -16,5 +16,10 @@ namespace Investahoot.Model
             Question = question;
             StartTime = DateTime.UtcNow;
         }
+
+        public int CalculateScore()
+        {
+            return (int)(1000 * (TimeLeft.TotalSeconds / Duration.TotalSeconds));
+        }
     }
 }

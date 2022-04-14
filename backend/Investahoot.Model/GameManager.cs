@@ -1,10 +1,5 @@
 ﻿using Investahoot.Model.Models;
 using Investahoot.Model.Vestaboard;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Investahoot.Model
 {
@@ -18,6 +13,7 @@ namespace Investahoot.Model
         }
 
         public List<Player> Players { get; } = new();
+        public IEnumerable<Player> PlayersByScore => Players.OrderByDescending(player => player.Score);
         public List<Question> AllQuestions { get; } = new();
         public Queue<Question> RemainingQuestions { get; } = new();
         public GameState State { get; private set; } = GameState.Lobby;
@@ -32,6 +28,16 @@ namespace Investahoot.Model
             AllQuestions = new QuestionLoader().LoadQuestions("questions.json");
             RemainingQuestions = new Queue<Question>(AllQuestions);
             ChangeState(GameState.Lobby);
+
+            AddPlayer(new Player("Testman"));
+        }
+
+        public Task AddPlayer(Player player)
+        {
+            ThrowIfNotInState(GameState.Lobby);
+
+            Players.Add(player);
+            return Task.CompletedTask;
         }
 
         public async Task BeginGame()
@@ -48,8 +54,7 @@ namespace Investahoot.Model
 
             CurrentRound = new Round(question);
 
-            var image = new VestaboardCharacterMessage(CurrentRound.Question.Image);
-            await _vestaboardService.SendImageMessage(image);
+            //await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(CurrentRound.Question.Image));
         }
 
         public async Task CheckIfTimeHasElapsed()
@@ -70,6 +75,12 @@ namespace Investahoot.Model
             if (!player.AnsweredQuestion(CurrentRound!.Question.Id))
             {
                 player.AddAnswer(CurrentRound.Question.Id, answerIndex);
+
+                if (answerIndex == CurrentRound!.Question.CorrectAnswerIndex)
+                {
+                    var points = CurrentRound.CalculateScore();
+                    player.GivePoints(points);
+                }
             }
 
             if (AllPlayersAnswered)

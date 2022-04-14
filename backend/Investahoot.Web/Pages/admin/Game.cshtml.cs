@@ -22,5 +22,11 @@ namespace Investahoot.Web.Pages.admin
             await Game.BeginGame();
             return Redirect("/admin/game");
         }
+
+        public async Task<IActionResult> OnPostGiveAnswer(string playerId, int answerIndex)
+        {
+            await Game.GiveAnswer(Guid.Parse(playerId), answerIndex);
+            return Redirect("/admin/game");
+        }
     }
 }
