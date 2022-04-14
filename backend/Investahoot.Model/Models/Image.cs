@@ -12,6 +12,7 @@ namespace Investahoot.Model.Models
         public const int Height = 6;
 
         private int[,] _cells;
+        public int[,] Cells => _cells;
 
         public Image()
         {

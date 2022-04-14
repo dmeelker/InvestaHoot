@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Investahoot.Model.Models;
+using Investahoot.Model.Vestaboard;
+using Investahoot.Web.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Investahoot.Web.Pages
@@ -6,15 +8,21 @@ namespace Investahoot.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly VestaboardService _vestaboardService;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, VestaboardService vestaboardService)
         {
             _logger = logger;
+            _vestaboardService = vestaboardService;
         }
 
-        public void OnGet()
+        public async Task OnGet()
         {
+            var textMessage = new VestaboardTextMessage("hoi");
+            await _vestaboardService.SendTextMessage(textMessage);
 
+            var imageMessage = new VestaboardCharacterMessage(new Image());
+            await _vestaboardService.SendImageMessage(imageMessage);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Investahoot.Web.Services
         {
             while (true)
             {
-                _game.CheckIfTimeHasElapsed();
+                await _game.CheckIfTimeHasElapsed();
                 await Task.Delay(10);
             }
         }

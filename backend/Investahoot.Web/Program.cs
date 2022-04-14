@@ -1,12 +1,14 @@
 using Investahoot.Model;
+using Investahoot.Model.Vestaboard;
 using Investahoot.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient<VestaboardService>();
 
-builder.Services.AddSingleton(new GameManager(new QuestionLoader().LoadQuestions("questions.json")));
+builder.Services.AddSingleton<GameManager>();
 builder.Services.AddHostedService<GameDriverService>();
 
 var app = builder.Build();

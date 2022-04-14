@@ -1,3 +1,5 @@
+import { AppBar, Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import React from 'react';
 import {
   Outlet,
@@ -5,21 +7,14 @@ import {
 } from 'react-router-dom';
 
 import './App.css';
+import ResponsiveAppBar from './AppBar';
 
 export default function App() {
   return (
     <div>
-      <h1>investahoot!</h1>
-      <nav
-        style={{
-          borderBottom: "solid 1px",
-          paddingBottom: "1rem",
-        }}
-      >
-        <Link to="/game">Game</Link>
-        <Link to="/about">About</Link> |{" "}
-      </nav>
+
+      <ResponsiveAppBar />
       <Outlet />
-    </div >
+    </div>
   );
 }

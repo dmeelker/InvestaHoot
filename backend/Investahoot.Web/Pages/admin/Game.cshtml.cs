@@ -17,9 +17,9 @@ namespace Investahoot.Web.Pages.admin
         {
         }
 
-        public IActionResult OnPostBeginGame()
+        public async Task<IActionResult> OnPostBeginGame()
         {
-            Game.BeginGame();
+            await Game.BeginGame();
             return Redirect("/admin/game");
         }
     }

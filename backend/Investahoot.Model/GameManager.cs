@@ -1,4 +1,5 @@
 ﻿using Investahoot.Model.Models;
+using Investahoot.Model.Vestaboard;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,40 +24,46 @@ namespace Investahoot.Model
 
         public Round? CurrentRound { get; private set; }
 
-        public GameManager(IEnumerable<Question> questions)
+        private readonly VestaboardService _vestaboardService;
+
+        public GameManager(VestaboardService vestaboardService)
         {
-            AllQuestions = questions.ToList();
-            RemainingQuestions = new Queue<Question>(questions);
+            _vestaboardService = vestaboardService;
+            AllQuestions = new QuestionLoader().LoadQuestions("questions.json");
+            RemainingQuestions = new Queue<Question>(AllQuestions);
             ChangeState(GameState.Lobby);
         }
 
-        public void BeginGame()
+        public async Task BeginGame()
         {
             ThrowIfNotInState(GameState.Lobby);
 
             ChangeState(GameState.Question);
-            NextQuestion();
+            await NextQuestion();
         }
 
-        public void NextQuestion()
+        public async Task NextQuestion()
         {
             var question = RemainingQuestions.Dequeue();
 
             CurrentRound = new Round(question);
+
+            var image = new VestaboardCharacterMessage(CurrentRound.Question.Image);
+            await _vestaboardService.SendImageMessage(image);
         }
 
-        public void CheckIfTimeHasElapsed()
+        public async Task CheckIfTimeHasElapsed()
         {
             if (CurrentRound == null)
                 return;
 
             if (CurrentRound.DurationElapsed)
             {
-                CompleteRound();
+                await CompleteRound();
             }
         }
 
-        public void GiveAnswer(Guid playerId, int answerIndex)
+        public async Task GiveAnswer(Guid playerId, int answerIndex)
         {
             var player = GetPlayer(playerId);
 
@@ -67,15 +74,15 @@ namespace Investahoot.Model
 
             if (AllPlayersAnswered)
             {
-                CompleteRound();
+                await CompleteRound();
             }
         }
 
-        private void CompleteRound()
+        private async Task CompleteRound()
         {
             if (RemainingQuestions.Any())
             {
-                NextQuestion();
+                await NextQuestion();
             }
             else
             {
