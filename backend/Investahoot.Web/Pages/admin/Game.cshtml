@@ -1,0 +1,47 @@
+﻿@page
+@model Investahoot.Web.Pages.admin.GameModel
+@{
+}
+
+<div>Current state: @Model.Game.State</div>
+
+<h3>Players:</h3>
+
+<ul>
+    @foreach (var player in @Model.Game.Players)
+    {
+                                            <li>@player.Name</li>
+    }
+</ul>
+
+@if (Model.Game.State == Investahoot.Model.GameManager.GameState.Lobby)
+{
+                                        <form asp-page-handler="BeginGame" method="post">
+                                            <button>Begin game</button>
+                                        </form>
+
+}
+else if (Model.Game.State == Investahoot.Model.GameManager.GameState.Question)
+{
+                                        <div>Current question: </div>
+
+                                        <div>Time left: @Model.Game.CurrentRound!.TimeLeft.ToString()</div>
+
+                                        <h3>Answer options:</h3>
+                                        <ul>
+        @foreach (var answer in @Model.Game.CurrentRound!.Question.Answers)
+        {
+                                                                                <li>@answer</li>
+        }
+                </ul>
+}
+else if (Model.Game.State == Investahoot.Model.GameManager.GameState.Score)
+{
+                <div>Game over! Scores here!</div>
+}
+
+<script type="text/javascript">
+    setTimeout(function () {
+      location.reload();
+    }, 1000);
+  </script>

@@ -1,7 +1,13 @@
+using Investahoot.Model;
+using Investahoot.Web.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton(new GameManager(new QuestionLoader().LoadQuestions("questions.json")));
+builder.Services.AddHostedService<GameDriverService>();
 
 var app = builder.Build();
 
