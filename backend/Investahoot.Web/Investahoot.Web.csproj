@@ -10,4 +10,8 @@
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Investahoot.Model\Investahoot.Model.csproj" />
+  </ItemGroup>
+
 </Project>
