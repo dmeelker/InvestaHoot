@@ -20,7 +20,7 @@ namespace Investahoot.Model
         {
             return new Question()
             {
-                Image = ConvertImage(model.Question),
+                Image = ConvertImage(model.Question.Select(line => line.ToCharArray().ToList()).ToList()),
                 Answers = model.Answers,
                 CorrectAnswerIndex = model.CorrectAnswer,
             };
@@ -43,7 +43,7 @@ namespace Investahoot.Model
 
         private class QuestionModel
         {
-            public List<List<char>> Question { get; set; } = new();
+            public List<string> Question { get; set; } = new();
             public List<string> Answers { get; set; } = new();
             public int CorrectAnswer { get; set; }
         }
