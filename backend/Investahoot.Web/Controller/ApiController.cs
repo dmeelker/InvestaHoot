@@ -59,7 +59,7 @@ namespace Investahoot.Web.Controller
                             State = "Question",
                             RoundId = _gameManager.CurrentRound!.Id,
                             Answers = _gameManager.CurrentRound!.Question.Answers,
-                            TimeLeft = _gameManager.CurrentRound!.TimeLeft.TotalSeconds,
+                            TimeLeft = (int) _gameManager.CurrentRound!.TimeLeft.TotalSeconds,
                             Answered = player.AnsweredQuestion(_gameManager.CurrentRound!.Question.Id)
                         });
                 case GameManager.GameState.Score:
