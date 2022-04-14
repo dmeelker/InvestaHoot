@@ -33,7 +33,7 @@ namespace Investahoot.Model.Vestaboard
 
         public async Task SendImageMessage(VestaboardCharacterMessage characterMessage)
         {
-            var json = JsonSerializer.Serialize(characterMessage, GetJsonOptions());
+            var json = JsonSerializer.Serialize(characterMessage.Characters, GetJsonOptions());
             var jsonContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
 
             using var httpResponseMessage = await _httpClient.PostAsync($"subscriptions/{_subscriptionId}/message", jsonContent);
@@ -41,7 +41,13 @@ namespace Investahoot.Model.Vestaboard
             httpResponseMessage.EnsureSuccessStatusCode();
         }
 
-        private static JsonSerializerOptions GetJsonOptions() => new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
+        private static JsonSerializerOptions GetJsonOptions() => 
+            new()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
+                WriteIndented = true,
+                Converters = { new Array2DConverter() }
+            };
     }
 
     public record VestaboardTextMessage(string Text);

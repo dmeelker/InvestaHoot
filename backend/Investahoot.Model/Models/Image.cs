@@ -12,7 +12,7 @@ namespace Investahoot.Model.Models
         public const int Height = 6;
 
         private int[,] _cells;
-        public int[,] Cells => _cells;
+        public int[,] Characters => _cells;
 
         public Image()
         {
@@ -21,11 +21,11 @@ namespace Investahoot.Model.Models
 
         private int[,] EmptyImage()
         {
-            var cells = new int[Width, Height];
+            var cells = new int[Height, Width];
 
-            for (var x = 0; x < Width; x++)
+            for (var x = 0; x < Height; x++)
             {
-                for (var y = 0; y < Height; y++)
+                for (var y = 0; y < Width; y++)
                 {
                     cells[x, y] = 0;
                 }

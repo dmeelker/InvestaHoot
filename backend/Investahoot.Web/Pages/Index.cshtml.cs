@@ -18,11 +18,6 @@ namespace Investahoot.Web.Pages
 
         public async Task OnGet()
         {
-            var textMessage = new VestaboardTextMessage("hoi");
-            await _vestaboardService.SendTextMessage(textMessage);
-
-            var imageMessage = new VestaboardCharacterMessage(new Image());
-            await _vestaboardService.SendImageMessage(imageMessage);
         }
     }
 }

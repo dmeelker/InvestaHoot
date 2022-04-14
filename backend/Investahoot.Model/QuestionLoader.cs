@@ -30,11 +30,11 @@ namespace Investahoot.Model
         {
             var image = new Image();
 
-            for (var x = 0; x < Image.Width; x++)
+            for (var x = 0; x < Image.Height; x++)
             {
-                for (var y = 0; y < Image.Height; y++)
+                for (var y = 0; y < Image.Width; y++)
                 {
-                    image.Set(x, y, ConvertToCode(question[y][x]));
+                    image.Set(x, y, ConvertToCode(question[x][y]));
                 }
             }
 
