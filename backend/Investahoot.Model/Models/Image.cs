@@ -42,6 +42,25 @@ namespace Investahoot.Model.Models
 
         public void SetText(int x, int y, string text)
         {
+            if (y < 0 || y >= Height)
+                return;
+
+            for (var i = 0; i < text.Length; i++)
+            {
+                if (x + i >= Width)
+                    break;
+
+                _cells[y, x + i] = text[i];
+            }
+        }
+
+        public void SetCentered(int y, string text)
+        {
+            if (y < 0 || y >= Height)
+                return;
+
+            var x = (Width / 2) - (text.Length / 2);
+
             for (var i = 0; i < text.Length; i++)
             {
                 if (x + i >= Width)

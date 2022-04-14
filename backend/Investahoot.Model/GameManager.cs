@@ -33,12 +33,27 @@ namespace Investahoot.Model
             AddPlayer(new Player("Testman"));
         }
 
-        public Task AddPlayer(Player player)
+        public async Task AddPlayer(Player player)
         {
             ThrowIfNotInState(GameState.Lobby);
 
             Players.Add(player);
-            return Task.CompletedTask;
+            await PostLobbyToVestaboard();
+        }
+
+        private async Task PostLobbyToVestaboard()
+        {
+            var image = new Image();
+            image.SetCentered(0, "ooooooo PLAYERS oooooo");
+
+            var y = 1;
+            foreach (var player in Players)
+            {
+                image.SetCentered(y, player.Name.ToUpper());
+                y++;
+            }
+
+            await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(image));
         }
 
         public async Task BeginGame()
