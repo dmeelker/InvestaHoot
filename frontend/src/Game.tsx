@@ -1,6 +1,9 @@
 import { List, Box, TextField, Button, ListItemButton, ListItemText } from "@mui/material";
 import React, { useState } from "react";
 
+const apiUrl: string = 'https://localhost:7280/api';
+const axios = require('axios').default;
+
 type EnterRoomProps = {
     fn: (name: string) => void
 };
@@ -34,19 +37,32 @@ const QuestionAnswers = ({ answers }: QuestionAnswerProps) => {
     )
 }
 
+// const Round = ({
+//     roundNumber: number,
+//     answers: string[],
+//     timeleft
+//});
+
 export default function Game() {
-    // const [playerName, setUser] = React.useState<string | null>(null);
 
-    // const enterFn = (name: string) => {
-    //     setUser(name);
-    // };
+    const [playerName, setUser] = React.useState<string | null>(null);
 
-    // return (
-    //     <EnterRoom fn={enterFn} />
-    // );
+    const enterFn = async (name: string) => {
+        setUser(name);
+
+        await axios.get(apiUrl.concat('/join?name='.concat(name)));
+    };
+
+    if (playerName !== null) {
+
+    }
+
     return (
-        <QuestionAnswers
-            answers={["hallo 1", "hallo2", "hallo3", "hallo4"]} />
+        <EnterRoom fn={enterFn} />
+    );
+    // return (
+    //     <QuestionAnswers
+    //         answers={["hallo 1", "hallo2", "hallo3", "hallo4"]} />
 
-    )
+    // )
 }

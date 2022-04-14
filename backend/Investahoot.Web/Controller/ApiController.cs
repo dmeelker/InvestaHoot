@@ -16,7 +16,7 @@ namespace Investahoot.Web.Controller
             _gameManager = gameManager;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("join")]
         public async Task<IActionResult> JoinGame(string name)
         {
