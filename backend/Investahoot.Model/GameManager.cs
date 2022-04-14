@@ -98,13 +98,15 @@ namespace Investahoot.Model
             }
             else
             {
-                FinishGame();
+                await FinishGame();
             }
         }
 
-        private void FinishGame()
+        private async Task FinishGame()
         {
             ChangeState(GameState.Score);
+            
+            await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(ScoreboardImage.CreateForTopThree(Players)));
         }
 
         private void ChangeState(GameState state)
