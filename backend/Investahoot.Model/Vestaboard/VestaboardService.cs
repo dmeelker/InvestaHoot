@@ -33,6 +33,8 @@ namespace Investahoot.Model.Vestaboard
 
         public async Task SendImageMessage(VestaboardCharacterMessage characterMessage)
         {
+            Console.WriteLine(characterMessage.Characters.ToString());
+
             var json = JsonSerializer.Serialize(new { characters = characterMessage.Characters.ToVestaboardImage() }, GetJsonOptions());
             var jsonContent = new StringContent(json, Encoding.UTF8, MediaTypeNames.Application.Json);
 

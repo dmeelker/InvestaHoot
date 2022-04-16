@@ -87,5 +87,21 @@ namespace Investahoot.Model.Models
 
             return result;
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            for (var y = 0; y < Height; y++)
+            {
+                for (var x = 0; x < Width; x++)
+                {
+                    sb.Append(_cells[y, x]);
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
     }
 }
