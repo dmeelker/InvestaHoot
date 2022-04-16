@@ -1,10 +1,194 @@
 ﻿@page
 @model IndexModel
 @{
+    Layout = "";
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<html>
+    <head>
+        <link rel="stylesheet" href="~/css/game.css" asp-append-version="true" />
+    </head>
+<body>
+    <h1>InvestaHOOT</h1>
+
+    <div id="loginPanel">
+        <input type="text" id="nameField" placeholder="What's your name?" /><br/>
+        <button id="loginButton">Play!</button>
+    </div>
+
+    <div id="lobbyPanel">
+        <h3>Waiting for the game to start!</h3>
+
+        <h4>Your opponents</h4>
+        <div id="lobbyPlayerList"></div>
+    </div>
+
+    <div id="questionPanel">
+        <h2>What's your answer?</h2>
+        <div id="answerButtonPanel">
+
+        </div>
+        <div><span id="timeLabel"></span> seconds left</div>
+    </div>
+
+    <div id="scorePanel">
+        <h2>Scores</h2>
+        <div>That's all folks!</div>
+        <ol id="playerScoresPanel">
+
+        </ol>
+    </div>
+
+
+    <script type="text/javascript">
+        const LoginState = 'login';
+        const LobbyState = 'lobby';
+        const QuestionState = 'question';
+        const ScoreState = 'score';
+
+        let lobbyPlayerListElement = document.getElementById('lobbyPlayerList');
+        let answerButtonPanel = document.getElementById('answerButtonPanel');
+        let playerScoresPanel = document.getElementById('playerScoresPanel');
+        let timeLabel = document.getElementById('timeLabel');
+
+        let gameId = '';
+        let playerId = '';
+        let state = null;
+        let gameState = null;
+
+        document.getElementById("loginButton").addEventListener("click", () => {
+            let name = document.getElementById("nameField").value;
+
+            fetch(`/api/join?name=${name}`)
+                .then(response => response.json())
+                .then(data => {
+                    gameId = data.gameId;
+                    playerId = data.playerId;
+
+                    updateState(LobbyState);
+                    listenForEvents();
+                })
+        });
+
+        function updateState(newState) {
+            if(state == newState)
+                return;
+
+            state = newState;
+            ensureStatePanelVisible(state);
+        }
+
+        function ensureStatePanelVisible(state) {
+            let allPanelIds = ['loginPanel', 'lobbyPanel', 'questionPanel', 'scorePanel'];
+            let statePanelId = getPanelIdForState(state);
+
+            for(let id of allPanelIds) {
+                let element = document.getElementById(id);
+                let visible = id == statePanelId;
+
+                element.style.display = visible ? '' : 'none';
+            }
+        }
+
+        function getPanelIdForState(state) {
+            switch(state) {
+                case LoginState:
+                    return 'loginPanel';
+                case LobbyState:
+                    return 'lobbyPanel';
+                case QuestionState:
+                    return 'questionPanel';
+                case ScoreState:
+                    return 'scorePanel';
+                default:
+                    throw Error('Unknown state: ' + state);
+            }
+        }
+
+        function processGameStateUpdate(gameState) {
+            if(gameState.State == 'Lobby') {
+                updateState(LobbyState);
+                showLobbyPlayers(gameState.Players);
+            } else if(gameState.State == 'Question') {
+                if(gameState.Answered) {
+                    answerButtonPanel.innerHTML = '';
+                } else {
+                    showAnswerButtons(gameState.Answers);
+                }
+
+                timeLabel.innerText = gameState.TimeLeft;
+                updateState(QuestionState);
+            } else if(gameState.State == 'Score') {
+                showScores(gameState.Players);
+                updateState(ScoreState);
+            }
+        }
+
+        function showLobbyPlayers(playerNames) {
+            lobbyPlayerListElement.innerHTML = '';
+
+            for(let name of playerNames) {
+                let element = document.createElement('div');
+                element.innerText = name;
+                lobbyPlayerListElement.appendChild(element);
+            }
+        }
+
+        function showAnswerButtons(answers) {
+            answerButtonPanel.innerHTML = '';
+            let index = 0;
+
+            for(let answer of answers) {
+                let element = document.createElement('button');
+                element.innerText = answer;
+                element.value = index;
+                element.addEventListener('click', onAnswerButtonClicked)
+                answerButtonPanel.appendChild(element);
+
+                index++;
+            }
+        }
+
+        function onAnswerButtonClicked(e) {
+            let answerIndex = e.srcElement.value;
+            fetch(`/api/answer?gameId=${gameId}&playerId=${playerId}&answer=${answerIndex}`, {
+                method: 'POST'});
+        }
+
+        function showScores(scores) {
+            playerScoresPanel.innerHTML = '';
+
+            for(let player of scores) {
+                let element = document.createElement('li');
+                element.innerText = `${player.Score} - ${player.Name}`;
+                playerScoresPanel.appendChild(element);
+            }
+        }
+
+        function listenForEvents() {
+            var source = new EventSource(`/api/events?gameId=${gameId}&playerId=${playerId}`);
+
+            source.addEventListener("open", function (event) {
+                console.log(event);
+                console.log("Connected");
+            }, false);
+
+            source.addEventListener("error", function (event) {
+                console.log(event);
+                console.log("Error");
+            }, false);
+
+            source.addEventListener("message", function (event) {
+                console.log(event);
+                console.log(event.data);
+
+                gameState = JSON.parse(event.data);
+                processGameStateUpdate(gameState);
+            }, false);
+        }
+
+        updateState(LoginState);
+    </script>
+</body>
+</html>

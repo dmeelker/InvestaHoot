@@ -1,0 +1,64 @@
+﻿@font-face {
+    font-family: 'Comical Cartoon Regular';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Comical Cartoon Regular'), url('Comical Cartoon.woff') format('woff');
+}
+
+* {
+    font-family: 'Comic Sans MS';
+    /*font-family: 'Comical Cartoon Regular';*/
+}
+
+body {
+    font-size: 35px;
+    text-align: center;
+}
+
+input, button {
+    font-size: 35px;
+    text-align: center;
+}
+
+button {
+    padding: .5em 1em;
+    border-radius: .5em;
+}
+
+input[type=text] {
+    padding: .5em;
+    border-radius: .5em;
+}
+
+#loginPanel, #lobbyPanel {
+    width: 80%;
+    margin: auto;
+}
+
+#loginButton {
+    margin-top: 2em;
+    width: 100%;
+}
+
+#questionPanel {
+    text-align: center;
+}
+
+#questionPanel button {
+    display: block;
+    width: 100%;
+    line-height: 300%;
+    margin-bottom: .5em;
+    font-weight: bold;
+    font-size: 150%;
+}
+
+#scorePanel {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+
+#scorePanel ol {
+    display: inline-block;
+}
