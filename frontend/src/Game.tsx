@@ -1,5 +1,6 @@
 import { List, Box, TextField, Button, ListItemButton, ListItemText } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useInterval } from "./utils";
 
 // const apiUrl: string = 'https://investahootbackend.azurewebsites.net/api';
 const apiUrl: string = 'https://localhost:7280/api';
@@ -70,6 +71,7 @@ export default function Game() {
     const [answers, setAnswers] = React.useState<string[]>([]);
     const [timeLeft, setTimeLeft] = React.useState<number>(0.0);
 
+
     const enterFn = async (name: string) => {
         setUser(name);
 
@@ -81,16 +83,16 @@ export default function Game() {
         console.log(response.data["gameId"]);
     };
 
+    const [count, setCount] = useState<number>(0);
+    const [delay, setDelay] = useState<number>(1000);
 
-    useEffect(() => {
-        const pollState = async () => {
-            if (!gameId)
-                return;
+    useInterval(
+        async () => {
             let response = await axios.get(apiUrl.concat('/state?playerId='.concat(playerId!).concat('&gameId=').concat(gameId!)));
 
             let responseState = response.data.state;
 
-            if (gameState !== responseState) {
+            if (responseState !== gameState) {
                 setGameState(responseState);
             }
 
@@ -102,9 +104,10 @@ export default function Game() {
                 setAnswers(response.data.answers);
                 setTimeLeft(response.data.timeLeft);
             }
-        }
-        setTimeout(pollState, 1000);
-    }, [playerId, gameId, gameState, answers, timeLeft]);
+        },
+
+        !gameId ? delay : null
+    );
 
 
     if (gameId === null) {
