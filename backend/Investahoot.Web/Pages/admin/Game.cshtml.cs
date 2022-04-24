@@ -28,5 +28,11 @@ namespace Investahoot.Web.Pages.admin
             await Game.GiveAnswer(Guid.Parse(playerId), answerIndex);
             return Redirect("/admin/game");
         }
+
+        public async Task<IActionResult> OnPostResetGame()
+        {
+            await Game.Reset();
+            return Redirect("/admin/game");
+        }
     }
 }

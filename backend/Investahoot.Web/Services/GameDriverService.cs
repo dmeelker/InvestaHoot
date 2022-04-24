@@ -13,10 +13,12 @@ namespace Investahoot.Web.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await _game.Reset();
+
             while (true)
             {
-                await _game.CheckIfTimeHasElapsed();
-                await Task.Delay(10);
+                await _game.Update();
+                await Task.Delay(1000);
             }
         }
     }

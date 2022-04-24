@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Investahoot.Model.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace Investahoot.Model.Models
         public string Name { get; }
         public Dictionary<Guid, int> GivenAnswersPerQuestionId { get; } = new();
         public int Score { get; private set; }
+        public EventStream Events { get; } = new();
 
         public Player(string name)
         {

@@ -57,6 +57,11 @@ else if (Model.Game.State == Investahoot.Model.GameManager.GameState.Score)
                     <div>Game over!</div>
 }
 
+
+<form asp-page-handler="ResetGame" method="post">
+    <button>Reset game</button>
+</form>
+
 @*<script type="text/javascript">
     setTimeout(function () {
     location.reload();

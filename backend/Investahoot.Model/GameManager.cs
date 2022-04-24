@@ -1,4 +1,5 @@
-﻿using Investahoot.Model.Models;
+﻿using Investahoot.Model.Events;
+using Investahoot.Model.Models;
 using Investahoot.Model.Vestaboard;
 
 namespace Investahoot.Model
@@ -12,14 +13,15 @@ namespace Investahoot.Model
             Score
         }
 
-        public Guid GameId { get; } = Guid.NewGuid();
+        public Guid GameId { get; private set; } = Guid.NewGuid();
         public List<Player> Players { get; } = new();
         public IEnumerable<Player> PlayersByScore => Players.OrderByDescending(player => player.Score);
         public List<Question> AllQuestions { get; } = new();
-        public Queue<Question> RemainingQuestions { get; } = new();
+        public Queue<Question> RemainingQuestions { get; private set; } = new();
         public GameState State { get; private set; } = GameState.Lobby;
 
         public Round? CurrentRound { get; private set; }
+        private readonly EventPublisher _eventPublisher = new();
 
         private readonly VestaboardService _vestaboardService;
 
@@ -27,10 +29,18 @@ namespace Investahoot.Model
         {
             _vestaboardService = vestaboardService;
             AllQuestions = new QuestionLoader().LoadQuestions("questions.json");
-            RemainingQuestions = new Queue<Question>(AllQuestions);
-            ChangeState(GameState.Lobby);
+        }
 
-            PostLobbyToVestaboard();
+        public async Task Reset()
+        {
+            _eventPublisher.PublishGameClosed(Players);
+
+            GameId = Guid.NewGuid();
+            RemainingQuestions = new Queue<Question>(AllQuestions);
+            Players.Clear();
+
+            ChangeState(GameState.Lobby);
+            await PostLobbyToVestaboard();
         }
 
         public async Task AddPlayer(Player player)
@@ -38,7 +48,14 @@ namespace Investahoot.Model
             ThrowIfNotInState(GameState.Lobby);
 
             Players.Add(player);
+            _eventPublisher.PublishLobbyEvent(Players);
             await PostLobbyToVestaboard();
+        }
+
+        public Task RemovePlayer(Player player)
+        {
+            Players.Remove(player);
+            return Task.CompletedTask;
         }
 
         private async Task PostLobbyToVestaboard()
@@ -78,6 +95,12 @@ namespace Investahoot.Model
             CurrentRound = new Round((CurrentRound?.Id ?? -1) + 1, question);
 
             await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(CurrentRound.Question.Image));
+            _eventPublisher.PublishQuestionEventToAll(Players, CurrentRound);
+        }
+
+        public async Task Update()
+        {
+            await CheckIfTimeHasElapsed();
         }
 
         public async Task CheckIfTimeHasElapsed()
@@ -104,6 +127,8 @@ namespace Investahoot.Model
                     var points = CurrentRound.CalculateScore();
                     player.GivePoints(points);
                 }
+
+                _eventPublisher.PublishQuestionEvent(player, CurrentRound);
             }
 
             if (AllPlayersAnswered)
@@ -129,6 +154,7 @@ namespace Investahoot.Model
             ChangeState(GameState.Score);
             
             await _vestaboardService.SendImageMessage(new VestaboardCharacterMessage(ScoreboardImage.CreateForTopThree(Players)));
+            _eventPublisher.PublishScores(PlayersByScore);
         }
 
         private void ChangeState(GameState state)

@@ -1,7 +1,9 @@
 ﻿using Investahoot.Model;
+using Investahoot.Model.Events;
 using Investahoot.Model.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Text.Json;
 
 namespace Investahoot.Web.Controller
@@ -32,97 +34,17 @@ namespace Investahoot.Web.Controller
             });
         }
 
-        public abstract class BaseStateResult
-        {
-            public string State { get; set; }
-            public abstract string Serialize();
-        }
-
-        public class LobbyStateResult : BaseStateResult
-        {
-            public List<string> Players { get; set; }
-
-            public override string Serialize()
-            {
-                return JsonSerializer.Serialize(this);
-            }
-        }
-
-        public class QuestionStateResult : BaseStateResult
-        {
-            public int RoundId { get; set; }
-            public List<string> Answers { get; set; }
-            public bool Answered { get; set; }
-            public int TimeLeft { get; set; }
-
-            public override string Serialize()
-            {
-                return JsonSerializer.Serialize(this);
-            }
-        }
-
-        public class ScoreStateResult : BaseStateResult
-        {
-            public List<PlayerScore> Players { get; set; }
-
-            public override string Serialize()
-            {
-                return JsonSerializer.Serialize(this);
-            }
-        }
-
-        public class PlayerScore
-        {
-            public string Name { get; set; }
-            public int Score { get; set; }
-        }
-
         [HttpGet]
         [Route("state")]
-        public ActionResult<BaseStateResult> GetState(Guid gameId, Guid playerId)
+        public ActionResult<GameEvent> GetState(Guid gameId, Guid playerId)
         {
-            if (_gameManager.GameId != gameId)
-                return BadRequest("Invalid game id");
-
-            if (!_gameManager.PlayerExists(playerId))
-                return BadRequest("Invalid player id");
+            if (_gameManager.GameId != gameId || !_gameManager.PlayerExists(playerId))
+            {
+                return new GameClosedEvent();
+            }
 
             var player = _gameManager.GetPlayer(playerId);
-
-            switch (_gameManager.State)
-            {
-                case GameManager.GameState.Lobby:
-                    return
-                        new LobbyStateResult
-                        {
-                            State = "Lobby",
-                            Players = _gameManager.Players.Select(player => player.Name).ToList()
-                        };
-                case GameManager.GameState.Question:
-                    return
-                        new QuestionStateResult
-                        {
-                            State = "Question",
-                            RoundId = _gameManager.CurrentRound!.Id,
-                            Answers = _gameManager.CurrentRound!.Question.Answers,
-                            TimeLeft = (int)_gameManager.CurrentRound!.TimeLeft.TotalSeconds,
-                            Answered = player.AnsweredQuestion(_gameManager.CurrentRound!.Question.Id)
-                        };
-                case GameManager.GameState.Score:
-                    return
-                        new ScoreStateResult
-                        {
-                            State = "Score",
-                            Players = _gameManager.Players.Select(player => new PlayerScore
-                            {
-                                Name = player.Name,
-                                Score = player.Score
-                            }).ToList()
-                        };
-
-                default:
-                    throw new Exception();
-            }
+            return player.Events.LastEvent;
         }
 
         [HttpGet]
@@ -131,21 +53,20 @@ namespace Investahoot.Web.Controller
         {
             Response.ContentType = "text/event-stream";
 
-            var lastState = "";
             while (!cancellationToken.IsCancellationRequested)
             {
-                var state = GetState(gameId, playerId).Value!.Serialize();
+                var player = _gameManager.GetPlayer(playerId);
 
-                if (state != lastState)
+                if(player == null)
                 {
-                    lastState = state;
-                    string data = $"data: {state}\n\n";
-
-                    await HttpContext.Response.WriteAsync(data);
-                    await HttpContext.Response.Body.FlushAsync();
+                    break;
                 }
 
-                await Task.Delay(100);
+                var e = await player.Events.WaitForEvent(cancellationToken);
+                string data = $"data: {JsonSerializer.Serialize(e, e.GetType())}\n\n";
+
+                await HttpContext.Response.WriteAsync(data);
+                await HttpContext.Response.Body.FlushAsync();
             }
 
             Response.Body.Close();

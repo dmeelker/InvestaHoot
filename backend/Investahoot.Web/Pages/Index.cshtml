@@ -56,6 +56,7 @@
         let playerId = '';
         let state = null;
         let gameState = null;
+        let eventStream = null;
 
         document.getElementById("loginButton").addEventListener("click", () => {
             let name = document.getElementById("nameField").value;
@@ -122,6 +123,9 @@
             } else if(gameState.State == 'Score') {
                 showScores(gameState.Players);
                 updateState(ScoreState);
+            } else if(gameState.State == 'Closed') {
+                stopListeningForEvents();
+                updateState(LoginState);
             }
         }
 
@@ -167,25 +171,33 @@
         }
 
         function listenForEvents() {
-            var source = new EventSource(`/api/events?gameId=${gameId}&playerId=${playerId}`);
+            stopListeningForEvents();
+            eventStream = new EventSource(`/api/events?gameId=${gameId}&playerId=${playerId}`);
 
-            source.addEventListener("open", function (event) {
+            eventStream.addEventListener("open", function (event) {
                 console.log(event);
                 console.log("Connected");
             }, false);
 
-            source.addEventListener("error", function (event) {
+            eventStream.addEventListener("error", function (event) {
                 console.log(event);
                 console.log("Error");
             }, false);
 
-            source.addEventListener("message", function (event) {
+            eventStream.addEventListener("message", function (event) {
                 console.log(event);
                 console.log(event.data);
 
                 gameState = JSON.parse(event.data);
                 processGameStateUpdate(gameState);
             }, false);
+        }
+
+        function stopListeningForEvents() {
+            if (eventStream) {
+                eventStream.close();
+                eventStream = null;
+            }
         }
 
         updateState(LoginState);
