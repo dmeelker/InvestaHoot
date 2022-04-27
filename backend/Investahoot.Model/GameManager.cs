@@ -10,6 +10,7 @@ namespace Investahoot.Model
         {
             Lobby,
             Question,
+            RoundResult,
             Score
         }
 
@@ -21,6 +22,7 @@ namespace Investahoot.Model
         public GameState State { get; private set; } = GameState.Lobby;
 
         public Round? CurrentRound { get; private set; }
+        private DateTime _stateStartTime = DateTime.UtcNow;
         private readonly EventPublisher _eventPublisher = new();
 
         private readonly VestaboardService _vestaboardService;
@@ -90,6 +92,7 @@ namespace Investahoot.Model
 
         public async Task NextQuestion()
         {
+            ChangeState(GameState.Question);
             var question = RemainingQuestions.Dequeue();
 
             CurrentRound = new Round((CurrentRound?.Id ?? -1) + 1, question);
@@ -100,17 +103,25 @@ namespace Investahoot.Model
 
         public async Task Update()
         {
-            await CheckIfTimeHasElapsed();
+            switch(State)
+            {
+                case GameState.Question:
+                    CheckIfTimeHasElapsed();
+                    break;
+                case GameState.RoundResult:
+                    await CheckRoundResultTimeout();
+                    break;
+            }
         }
 
-        public async Task CheckIfTimeHasElapsed()
+        public void CheckIfTimeHasElapsed()
         {
             if (CurrentRound == null)
                 return;
-
+            Console.WriteLine($"Timeleft: {CurrentRound.TimeLeft}");
             if (CurrentRound.DurationElapsed)
             {
-                await CompleteRound();
+                ShowRoundResults();
             }
         }
 
@@ -120,18 +131,33 @@ namespace Investahoot.Model
 
             if (!player.AnsweredQuestion(CurrentRound!.Question.Id))
             {
-                player.AddAnswer(CurrentRound.Question.Id, answerIndex);
+                var points = 0;
 
                 if (answerIndex == CurrentRound!.Question.CorrectAnswerIndex)
                 {
-                    var points = CurrentRound.CalculateScore();
+                    points = CurrentRound.CalculateScore();
                     player.GivePoints(points);
                 }
 
+                player.AddAnswer(CurrentRound.Question.Id, answerIndex, points);
                 _eventPublisher.PublishQuestionEvent(player, CurrentRound);
             }
 
             if (AllPlayersAnswered)
+            {
+                ShowRoundResults();
+            }
+        }
+
+        private void ShowRoundResults()
+        {
+            ChangeState(GameState.RoundResult);
+            _eventPublisher.PublishRoundFinishedEventToAll(PlayersByScore, CurrentRound!);
+        }
+
+        private async Task CheckRoundResultTimeout()
+        {
+            if(StateDuration > TimeSpan.FromSeconds(3))
             {
                 await CompleteRound();
             }
@@ -160,7 +186,10 @@ namespace Investahoot.Model
         private void ChangeState(GameState state)
         {
             State = state;
+            _stateStartTime = DateTime.UtcNow;
         }
+
+        private TimeSpan StateDuration => DateTime.UtcNow.Subtract(_stateStartTime);
 
         private bool AllPlayersAnswered => Players.All(p => p.AnsweredQuestion(CurrentRound!.Question.Id));
 

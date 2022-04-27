@@ -37,6 +37,25 @@ namespace Investahoot.Model
                 (int)round.TimeLeft.TotalSeconds));
         }
 
+        public void PublishRoundFinishedEventToAll(IEnumerable<Player> players, Round round)
+        {
+            var index = 1;
+            foreach (var player in players)
+            {
+                PublicRoundFinishedEvent(player, index, round);
+                index++;
+            }
+        }
+
+        public void PublicRoundFinishedEvent(Player player, int rankingIndex, Round round)
+        {
+            player.Events.PublishEvent(new RoundFinishedEvent(
+                correctAnswer: player.AnsweredQuestionCorrectly(round.Question.Id, round.Question.CorrectAnswerIndex),
+                points: player.GetPointsForQuestion(round.Question.Id),
+                currentRanking: rankingIndex
+            ));
+        }
+
         public void PublishScores(IEnumerable<Player> players)
         {
             var e = new ScoreEvent(

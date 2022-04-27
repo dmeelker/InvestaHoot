@@ -32,6 +32,19 @@
         <div><span id="timeLabel"></span> seconds left</div>
     </div>
 
+    <div id="roundFinishedPanel">
+        <h2>Round over!</h2>
+
+        <div>Your answer was</div>
+        <div id="correctAnswerPanel">
+            CORRECT!
+        </div>
+        <div id="incorrectAnswerPanel">
+            INCORRECT!
+        </div>
+        You got <span id="pointsLabel"></span> points. You are now in spot <span id="rankingLabel"></span>
+    </div>
+
     <div id="scorePanel">
         <h2>Scores</h2>
         <div>That's all folks!</div>
@@ -45,6 +58,7 @@
         const LoginState = 'login';
         const LobbyState = 'lobby';
         const QuestionState = 'question';
+        const RoundFinishedState = 'roundfinished';
         const ScoreState = 'score';
 
         let lobbyPlayerListElement = document.getElementById('lobbyPlayerList');
@@ -81,7 +95,7 @@
         }
 
         function ensureStatePanelVisible(state) {
-            let allPanelIds = ['loginPanel', 'lobbyPanel', 'questionPanel', 'scorePanel'];
+            let allPanelIds = ['loginPanel', 'lobbyPanel', 'questionPanel', 'roundFinishedPanel', 'scorePanel'];
             let statePanelId = getPanelIdForState(state);
 
             for(let id of allPanelIds) {
@@ -100,6 +114,8 @@
                     return 'lobbyPanel';
                 case QuestionState:
                     return 'questionPanel';
+                case RoundFinishedState:
+                    return 'roundFinishedPanel'
                 case ScoreState:
                     return 'scorePanel';
                 default:
@@ -120,6 +136,9 @@
 
                 timeLabel.innerText = gameState.TimeLeft;
                 updateState(QuestionState);
+            } else if(gameState.State == 'RoundFinished') {
+                showRoundResults(gameState);
+                updateState(RoundFinishedState);
             } else if(gameState.State == 'Score') {
                 showScores(gameState.Players);
                 updateState(ScoreState);
@@ -158,6 +177,24 @@
             let answerIndex = e.srcElement.value;
             fetch(`/api/answer?gameId=${gameId}&playerId=${playerId}&answer=${answerIndex}`, {
                 method: 'POST'});
+        }
+
+        function showRoundResults(state) {
+            const correctAnswerPanel = document.getElementById('correctAnswerPanel');
+            const incorrectAnswerPanel = document.getElementById('incorrectAnswerPanel');
+            const pointsLabel = document.getElementById('pointsLabel');
+            const rankingLabel = document.getElementById('rankingLabel');
+
+            if(state.CorrectAnswer) {
+                correctAnswerPanel.style.display = '';
+                incorrectAnswerPanel.style.display = 'none';
+            } else {
+                correctAnswerPanel.style.display = 'none';
+                incorrectAnswerPanel.style.display = '';
+            }
+
+            pointsLabel.innerText = state.Points;
+            rankingLabel.innerText = state.CurrentRanking;
         }
 
         function showScores(scores) {
