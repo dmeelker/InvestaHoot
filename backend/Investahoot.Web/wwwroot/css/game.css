@@ -44,14 +44,14 @@ input[type=text] {
     text-align: center;
 }
 
-#questionPanel button {
-    display: block;
-    width: 100%;
-    line-height: 300%;
-    margin-bottom: .5em;
-    font-weight: bold;
-    font-size: 150%;
-}
+    #questionPanel button {
+        display: block;
+        width: 100%;
+        line-height: 300%;
+        margin-bottom: .5em;
+        font-weight: bold;
+        font-size: 150%;
+    }
 
 #scorePanel {
     width: 80%;
@@ -59,6 +59,16 @@ input[type=text] {
     text-align: center;
 }
 
-#scorePanel ol {
-    display: inline-block;
+    #scorePanel ol {
+        display: inline-block;
+    }
+
+@keyframes pulse {
+    from {
+        transform: scale(1) rotate(-10deg);
+    }
+
+    to {
+        transform: scale(2.0) rotate(12deg);
+    }
 }

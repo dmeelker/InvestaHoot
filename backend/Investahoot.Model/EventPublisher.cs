@@ -1,10 +1,5 @@
 ﻿using Investahoot.Model.Events;
 using Investahoot.Model.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Investahoot.Model
 {
@@ -12,17 +7,16 @@ namespace Investahoot.Model
     {
         public void PublishLobbyEvent(IEnumerable<Player> players)
         {
-            var playerNames = players.Select(p => p.Name).ToList();
-
-            foreach(var player in players)
+            foreach (var player in players)
             {
-                player.Events.PublishEvent(new LobbyEvent(playerNames));
+                var otherPlayerNames = players.Except(new[] { player }).Select(p => p.Name).ToList();
+                player.Events.PublishEvent(new LobbyEvent(otherPlayerNames));
             }
         }
 
         public void PublishQuestionEventToAll(IEnumerable<Player> players, Round round)
         {
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 PublishQuestionEvent(player, round);
             }
@@ -62,7 +56,7 @@ namespace Investahoot.Model
                 players.Select(player => new PlayerScore(player.Name, player.Score))
                 .ToList());
 
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 player.Events.PublishEvent(e);
             }
@@ -72,7 +66,7 @@ namespace Investahoot.Model
         {
             var e = new GameClosedEvent();
 
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 player.Events.PublishEvent(e);
             }
