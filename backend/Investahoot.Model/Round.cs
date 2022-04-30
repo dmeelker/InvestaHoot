@@ -7,7 +7,7 @@ namespace Investahoot.Model
         public int Id { get; }
         public Question Question { get; }
         public DateTime StartTime { get; }
-        public TimeSpan Duration => TimeSpan.FromHours(1);
+        public TimeSpan Duration => TimeSpan.FromSeconds(10);
 
         public TimeSpan TimeLeft => Duration - (DateTime.UtcNow - StartTime);
         public bool DurationElapsed => TimeLeft.TotalMilliseconds <= 0;

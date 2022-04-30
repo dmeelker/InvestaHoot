@@ -1,4 +1,11 @@
-﻿import * as Dom from './dom.js';
+﻿"use strict";
+
+import * as Dom from './dom.js';
+import { } from './components/logincomponent.js';
+import { } from './components/lobbycomponent.js';
+import { } from './components/questioncomponent.js';
+import { } from './components/roundresultcomponent.js';
+import { } from './components/scorescomponent.js';
 
 const LoginState = 'login';
 const LobbyState = 'lobby';
@@ -6,20 +13,26 @@ const QuestionState = 'question';
 const RoundFinishedState = 'roundfinished';
 const ScoreState = 'score';
 
-let lobbyPlayerListElement = document.getElementById('lobbyPlayerList');
-let answerButtonPanel = document.getElementById('answerButtonPanel');
-let playerScoresPanel = document.getElementById('playerScoresPanel');
-let timeLabel = document.getElementById('timeLabel');
-
 let gameId = '';
 let playerId = '';
 let state = null;
-let gameState = null;
 let eventStream = null;
 
-document.getElementById("loginButton").addEventListener("click", () => {
-    let name = document.getElementById("nameField").value;
+const loginPanel = document.querySelector("login-panel");
+const lobbyPanel = document.querySelector("lobby-panel");
+const questionPanel = document.querySelector("question-panel");
+const roundResultPanel = document.querySelector("round-result-panel");
+const scoresPanel = document.querySelector("scores-panel");
 
+const panelForState = new Map([
+    [LoginState, loginPanel],
+    [LobbyState, lobbyPanel],
+    [QuestionState, questionPanel],
+    [RoundFinishedState, roundResultPanel],
+    [ScoreState, scoresPanel]
+]);
+
+export function joinGame(name) {
     fetch(`/api/join?name=${name}`)
         .then(response => response.json())
         .then(data => {
@@ -29,7 +42,7 @@ document.getElementById("loginButton").addEventListener("click", () => {
             updateState(LobbyState);
             listenForEvents();
         })
-});
+}
 
 function updateState(newState) {
     if (state == newState)
@@ -40,117 +53,16 @@ function updateState(newState) {
 }
 
 function ensureStatePanelVisible(state) {
-    let allPanelIds = ['loginPanel', 'lobbyPanel', 'questionPanel', 'roundFinishedPanel', 'scorePanel'];
-    let statePanelId = getPanelIdForState(state);
+    let statePanel = panelForState.get(state);
 
-    for (let id of allPanelIds) {
-        let element = document.getElementById(id);
-        let visible = id == statePanelId;
-
-        Dom.setVisible(element, visible);
-    }
+    Dom.hideAll(panelForState.values());
+    Dom.show(statePanel);
 }
 
-function getPanelIdForState(state) {
-    switch (state) {
-        case LoginState:
-            return 'loginPanel';
-        case LobbyState:
-            return 'lobbyPanel';
-        case QuestionState:
-            return 'questionPanel';
-        case RoundFinishedState:
-            return 'roundFinishedPanel'
-        case ScoreState:
-            return 'scorePanel';
-        default:
-            throw Error('Unknown state: ' + state);
-    }
-}
-
-function processGameStateUpdate(gameState) {
-    if (gameState.State == 'Lobby') {
-        updateState(LobbyState);
-        showLobbyPlayers(gameState.Players);
-    } else if (gameState.State == 'Question') {
-        if (gameState.Answered) {
-            answerButtonPanel.innerHTML = '';
-        } else {
-            showAnswerButtons(gameState.Answers);
-        }
-
-        timeLabel.innerText = gameState.TimeLeft;
-        updateState(QuestionState);
-    } else if (gameState.State == 'RoundFinished') {
-        showRoundResults(gameState);
-        updateState(RoundFinishedState);
-    } else if (gameState.State == 'Score') {
-        showScores(gameState.Players);
-        updateState(ScoreState);
-    } else if (gameState.State == 'Closed') {
-        stopListeningForEvents();
-        updateState(LoginState);
-    }
-}
-
-function showLobbyPlayers(playerNames) {
-    lobbyPlayerListElement.innerHTML = '';
-
-    for (let name of playerNames) {
-        let element = document.createElement('div');
-        element.innerText = name;
-        lobbyPlayerListElement.appendChild(element);
-    }
-}
-
-function showAnswerButtons(answers) {
-    answerButtonPanel.innerHTML = '';
-    let index = 0;
-
-    for (let answer of answers) {
-        let element = document.createElement('button');
-        element.innerText = answer;
-        element.value = index;
-        element.addEventListener('click', onAnswerButtonClicked)
-        answerButtonPanel.appendChild(element);
-
-        index++;
-    }
-}
-
-function onAnswerButtonClicked(e) {
-    let answerIndex = e.srcElement.value;
+export function answerQuestion(answerIndex) {
     fetch(`/api/answer?gameId=${gameId}&playerId=${playerId}&answer=${answerIndex}`, {
         method: 'POST'
     });
-}
-
-function showRoundResults(state) {
-    const correctAnswerPanel = document.getElementById('correctAnswerPanel');
-    const incorrectAnswerPanel = document.getElementById('incorrectAnswerPanel');
-    const pointsLabel = document.getElementById('pointsLabel');
-    const rankingLabel = document.getElementById('rankingLabel');
-
-    if (state.CorrectAnswer) {
-        Dom.show(correctAnswerPanel);
-        Dom.hide(incorrectAnswerPanel);
-    } else {
-        Dom.show(incorrectAnswerPanel);
-        Dom.hide(correctAnswerPanel);
-    }
-
-    pointsLabel.innerText = state.Points;
-    rankingLabel.innerText = state.CurrentRanking;
-}
-
-function showScores(scores) {
-    playerScoresPanel.innerHTML = '';
-
-    for (let player of scores) {
-        let element = document.createElement('li');
-        element.innerText = `${player.Score} - ${player.Name}`;
-        playerScoresPanel.appendChild(element);
-    }
 }
 
 function listenForEvents() {
@@ -158,22 +70,39 @@ function listenForEvents() {
     eventStream = new EventSource(`/api/events?gameId=${gameId}&playerId=${playerId}`);
 
     eventStream.addEventListener("open", function (event) {
-        console.log(event);
         console.log("Connected");
     }, false);
 
     eventStream.addEventListener("error", function (event) {
         console.log(event);
-        console.log("Error");
     }, false);
 
     eventStream.addEventListener("message", function (event) {
-        console.log(event);
         console.log(event.data);
 
-        gameState = JSON.parse(event.data);
+        const gameState = JSON.parse(event.data);
         processGameStateUpdate(gameState);
     }, false);
+}
+
+function processGameStateUpdate(event) {
+    if (event.State == 'Lobby') {
+        lobbyPanel.players = event.Players;
+        updateState(LobbyState);
+    } else if (event.State == 'Question') {
+        questionPanel.update(event);
+        updateState(QuestionState);
+    } else if (event.State == 'RoundFinished') {
+        roundResultPanel.update(event);
+        updateState(RoundFinishedState);
+    } else if (event.State == 'Score') {
+        scoresPanel.update(event.Players);
+        updateState(ScoreState);
+    } else if (event.State == 'Closed') {
+        stopListeningForEvents();
+        loginPanel.reset();
+        updateState(LoginState);
+    }
 }
 
 function stopListeningForEvents() {
