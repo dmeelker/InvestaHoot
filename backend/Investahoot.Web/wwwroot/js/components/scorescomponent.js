@@ -5,6 +5,7 @@ class ScoresPanel extends HTMLElement {
         super();
 
         this.innerHTML = `
+            <game-logo></game-logo>
             <h2>Scores</h2>
             <div>That's all folks!</div>
             <ol class="playerScoresPanel">

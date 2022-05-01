@@ -6,6 +6,7 @@ import { } from './components/lobbycomponent.js';
 import { } from './components/questioncomponent.js';
 import { } from './components/roundresultcomponent.js';
 import { } from './components/scorescomponent.js';
+import { } from './components/gamelogo.js';
 
 const LoginState = 'login';
 const LobbyState = 'lobby';

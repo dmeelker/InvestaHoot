@@ -13,11 +13,88 @@
 body {
     font-size: 35px;
     text-align: center;
+    background-color: #e77a15;
+    color: #12121c;
+    color: #fff;
+    text-shadow: 1px 1px 3px #000000;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.rounded {
+    border-radius: 6px;
+}
+
+.padding-m {
+    padding: 1em;
+}
+
+.padding-s {
+    padding: .5em;
+}
+
+.margin-top-m {
+    margin-top: 1em;
+}
+
+.shadow {
+    box-shadow: rgb(0 0 0 / 15%) 0px 2px 4px;
+}
+
+.center-vertical {
+    margin: auto;
 }
 
 input, button {
-    font-size: 35px;
+    /*font-size: 35px;*/
     text-align: center;
+}
+
+
+.button-main {
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #fa6400;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    width: auto;
+}
+
+.button-main:hover,
+.button-main:focus {
+    background-color: #fb8332;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.button-main:hover {
+    transform: translateY(-1px);
+}
+
+.button-main:active {
+    background-color: #c85000;
+    box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+    transform: translateY(0);
 }
 
 button {
@@ -28,30 +105,37 @@ button {
 input[type=text] {
     padding: .5em;
     border-radius: .5em;
+    border: solid 2px gray;
 }
 
-#loginPanel, #lobbyPanel {
+input[type=text]:focus {
+    padding: .5em;
+    border-radius: .5em;
+    border: solid 2px black;
+}
+
+h2, h3 {
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+/*#loginPanel, #lobbyPanel {
     width: 80%;
     margin: auto;
-}
-
-#loginButton {
-    margin-top: 2em;
-    width: 100%;
-}
+}*/
 
 #questionPanel {
     text-align: center;
 }
 
-    #questionPanel button {
-        display: block;
-        width: 100%;
-        line-height: 300%;
-        margin-bottom: .5em;
-        font-weight: bold;
-        font-size: 150%;
-    }
+#questionPanel button {
+    display: block;
+    width: 100%;
+    line-height: 300%;
+    margin-bottom: .5em;
+    font-weight: bold;
+    font-size: 150%;
+}
 
 #scorePanel {
     width: 80%;
@@ -59,16 +143,23 @@ input[type=text] {
     text-align: center;
 }
 
-    #scorePanel ol {
-        display: inline-block;
-    }
+#scorePanel ol {
+    display: inline-block;
+}
+
+.pulse {
+    display: inline-block;
+    animation-name: pulse;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+}
 
 @keyframes pulse {
     from {
-        transform: scale(1) rotate(-10deg);
+        transform: scale(1.5);
     }
 
     to {
-        transform: scale(2.0) rotate(12deg);
+        transform: scale(1);
     }
 }

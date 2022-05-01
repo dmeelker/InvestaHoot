@@ -7,8 +7,8 @@ class QuestionPanel extends HTMLElement {
 
         this.innerHTML = `
             <h2>What's your answer?</h2>
-            <div class="answerButtonPanel"></div>
             <div class="timePanel"><span class="timeLabel"></span> seconds left</div>
+            <div class="answerButtonPanel"></div>
 `;
 
         this.answerPanel = this.querySelector('.answerButtonPanel');
@@ -69,7 +69,16 @@ class QuestionPanel extends HTMLElement {
     }
 
     updateTimeLeft() {
+        if (this.timeLabel.innerText == this.secondsLeft)
+            return;
+
         this.timeLabel.innerText = this.secondsLeft;
+        this.pulseTimeLeft();
+    }
+
+    pulseTimeLeft() {
+        this.timeLabel.classList.add('pulse');
+        window.setTimeout(() => this.timeLabel.classList.remove('pulse'), 900);
     }
 
     enableQuestionButtons() {

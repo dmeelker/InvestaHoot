@@ -5,8 +5,11 @@ class LoginPanel extends HTMLElement {
         super();
 
         this.innerHTML = `
-            <input type="text" id="nameField" placeholder="What's your name?" /><br />
-            <button id="loginButton">Play!</button>
+            <game-logo></game-logo>
+            <div class="bg-white rounded padding-m center-vertical shadow" style="max-width: 10em;">
+                <input type="text" id="nameField" placeholder="What's your name?" /><br />
+                <button id="loginButton" class="button-main margin-top-m">Play!</button>
+            </div>
 `;
 
         this.loginButton = this.querySelector('button');
